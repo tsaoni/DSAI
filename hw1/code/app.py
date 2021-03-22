@@ -1,5 +1,5 @@
 import os
-from train1 import Model
+from train2 import Model
 
 if __name__ == '__main__':
     import argparse
@@ -16,4 +16,5 @@ if __name__ == '__main__':
     model = Model()
     model.train(df_training)
     df_result = model.predict(n_step=7)
-#    df_result.to_csv = (args.output, index=0)
+    new_path = os.path.relpath("../output/" + args.output, cur_path)
+    df_result.to_csv(new_path, index=0)

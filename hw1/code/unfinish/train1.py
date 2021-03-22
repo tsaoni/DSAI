@@ -98,6 +98,8 @@ class Model:
         pred_y = np.array([])
         for i in range(self.days, len(df.index)):
             pred_x = np.array(df.iloc[i - self.days : i, 3])
+            for j in range(len(pred_y) - min(self.days, len(pred_y)), len(pred_y)):
+                pred_x[self.days - len(pred_y) + j] = pred_y[j]
             pred_x = np.append(pred_x, 1)
             pred_y = np.append(pred_y, np.dot(pred_x, self.parameters))
         for i in range(self.days, len(df.index)):
