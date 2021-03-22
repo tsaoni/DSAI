@@ -20,3 +20,25 @@ Time Series For beginners with ARIMA
 https://www.kaggle.com/freespirit08/time-series-for-beginners-with-arima
 
 
+### 程式分析圖
+
+#### 原始資料
+
+原始訓練集的資料分布
+![](https://i.imgur.com/NCOFtMi.png)
+
+左方為ACF，右方為PACF，分別預測Q(moving avg.)跟P(auto regressive lags)的值
+![](https://i.imgur.com/koGxdpA.png)
+
+
+AR model預測的結果
+![](https://i.imgur.com/khwsxP5.png)
+
+MA model預測的結果
+![](https://i.imgur.com/PutSyDV.png)
+
+
+預測結果
+![](https://i.imgur.com/ISUbmzs.png)
+
+
