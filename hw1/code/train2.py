@@ -59,7 +59,7 @@ class Model:
         indexedDataset = self.df.set_index(['日期'])
         indexedDataset.head(5)
         print(indexedDataset)
-        """        
+        """         
         plt.xlabel("date")
         plt.ylabel("Backup capacity")
         plt.plot(indexedDataset)
@@ -96,7 +96,7 @@ class Model:
 
         #Estimating trend
         indexedDataset_logScale = np.log(indexedDataset)
-        """
+        """        
         plt.plot(indexedDataset_logScale)
         plt.show()
         """
@@ -136,7 +136,7 @@ class Model:
         # **Time Shift Transformation**
 
         datasetLogDiffShifting = indexedDataset_logScale - indexedDataset_logScale.shift()
-        """
+        """ 
         plt.plot(datasetLogDiffShifting)
         plt.show()
         """
@@ -183,7 +183,7 @@ class Model:
         lag_acf = acf(datasetLogDiffShifting, nlags=20)
         lag_pacf = pacf(datasetLogDiffShifting, nlags=20, method='ols')
 
-        """
+        """ 
         #Plot ACF:
         plt.subplot(121)
         plt.plot(lag_acf)
@@ -227,8 +227,8 @@ class Model:
         plt.plot(results_MA.fittedvalues, color='red')
         plt.title('RSS: %.4f'%sum((results_MA.fittedvalues - datasetLogDiffShifting["備轉容量(萬瓩)"])**2))
         plt.show()
-        """
         print('Plotting MA model')
+        """
 
         # AR+I+MA = ARIMA model
         model = ARIMA(indexedDataset_logScale, order=(2,1,2))
@@ -239,7 +239,6 @@ class Model:
         plt.title('RSS: %.4f'%sum((results_ARIMA.fittedvalues - datasetLogDiffShifting["備轉容量(萬瓩)"])**2))
         plt.show()
         """
-        print('Plotting ARIMA model')
 
         # ***Prediction & Reverse transformations***
 
@@ -267,7 +266,7 @@ class Model:
 
     def predict(self, n_step):
 
-        self.result.plot_predict(1, 469)
+        #self.result.plot_predict(1, 469)
         print(np.exp(self.result.forecast(120)[0]))
         target = np.exp(self.result.forecast(120)[0])
         plt.show()

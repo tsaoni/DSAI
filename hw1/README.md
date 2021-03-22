@@ -1,4 +1,4 @@
-##### DSAI HW1 - Electricity Forecasting
+# DSAI HW1 - Electricity Forecasting
 
 ###### F74072277 許郁翎
 
