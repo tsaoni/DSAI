@@ -1,6 +1,8 @@
 from DDQN import Trader 
 import pandas as pd
 import os
+import timeit
+
 
 def load_data(trainfile, testfile):
     cur_path = os.path.dirname(__file__)
@@ -11,6 +13,7 @@ def load_data(trainfile, testfile):
 
 if __name__ == "__main__":
     import argparse
+    start = timeit.default_timer()
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--training", default = "training_data.csv", help = "input training data file name")
@@ -26,8 +29,11 @@ if __name__ == "__main__":
     new_path = os.path.relpath("../output/" + args.output, cur_path)
 
     with open(new_path, "w") as output_file:
-        for row in range(0, len(testing_data)):
+        for row in range(0, len(testing_data) - 1):
             action = trader.predict_action(testing_data.iloc[row, :])
             output_file.write(action)
-
             #trader.re_training(i)
+
+    stop = timeit.default_timer()
+    print("\n\n\n\nexecution time: ", stop - start)
+

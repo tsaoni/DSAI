@@ -11,7 +11,7 @@ import plotly.io as pio
 
 class Trader:
     def __init__(self):
-        # self.predict = False
+        self.predict = False
         self.test_env = 0
         self.test_pobs = 0
         self.Q = 0
@@ -43,11 +43,7 @@ class Trader:
         self.test_env.data = self.test_env.data.append(row)
         obs, reward, done = self.test_env.step(pact)
         self.test_pobs = obs
-
-        ret = self.test_env.pre_act
-        if self.test_env.pre_act == 2:
-            ret = -1
-        return str(ret) + "\n"
+        return str(pact) + "\n"
 
 
 class Environment1:
@@ -71,26 +67,19 @@ class Environment1:
     def step(self, act):
 
         reward = 0
-        if self.t > 3:
-            time_delay = 3
-        else:
-            time_delay = self.t
 
         
         # act = 0: stay, 1: buy, 2: sell
         if self.pre_act == 1:
             #self.positions.append(self.data.iloc[self.t, :]['Close'])
 
-            """
             if self.position < 0:
                 reward = -1
-            """
-            if self.position == 0:
+            elif self.position == 0:
                 self.position = -self.data.iloc[self.t, :]["open"]
             elif self.position > 0:
                 profits = self.position - self.data.iloc[self.t, :]["open"]
-                for i in range(1, time_delay):
-                    reward += self.data.iloc[self.t - i, :]["open"] - self.data.iloc[self.t, :]["open"]
+                reward += profits
                 self.profits += profits
                 self.position = 0
 
@@ -106,17 +95,13 @@ class Environment1:
                 self.profits += profits
                 self.positions = []
             """
-
-            """
             if self.position > 0:
                 reward = -1
-            """
-            if self.position == 0:
+            elif self.position == 0:
                 self.position = self.data.iloc[self.t, :]["open"]
             elif self.position < 0:
                 profits = self.data.iloc[self.t, :]["open"] + self.position
-                for i in range(1, time_delay):
-                    reward += self.data.iloc[self.t, :]["open"] - self.data.iloc[self.t - i, :]["open"]
+                reward += profits
                 self.profits += profits
                 self.position = 0
 
@@ -124,30 +109,8 @@ class Environment1:
         for p in self.positions:
             self.position_value += (self.data.iloc[self.t, :]['Close'] - p)
         """
-
-        if self.position > 0 and act == 2:
-            if np.random.randint(2) == 0:
-                self.pre_act = 0
-            else:
-                self.pre_act = 1
-        elif self.position < 0 and act == 1:
-            if np.random.randint(2) == 0:
-                self.pre_act = 0
-            else:
-                self.pre_act = 2
-        else:
-            self.pre_act = act
-        """
-        elif act == 0:
-            if np.random.randint(5) == 0:
-                if self.position == 0:
-                    self.pre_act = np.random.randint(2) + 1
-                elif self.position > 0:
-                    self.pre_act = 1
-                else:
-                    self.pre_act = 2
-        """
-
+        
+        self.pre_act = act
 
         # clipping reward
         if reward > 0:
@@ -155,35 +118,18 @@ class Environment1:
         elif reward < 0:
             reward = -1
 
-
 #        print(self.position)
-        self.position_value = 0
-        self.position_value = self.position - self.data.iloc[self.t, :]["open"]
-        """
         if self.position > 0:
             self.position_value = self.position - self.data.iloc[self.t, :]["open"]
         elif self.position < 0:
             self.position_value = self.position + self.data.iloc[self.t, :]["open"]
-        """
 
         self.history.pop(0)
         self.history.append(self.data.iloc[self.t, :]["open"] - self.data.iloc[(self.t-1), :]["open"])
         
         # set next time
         self.t += 1
-
-        """
-        obs_act = 0
-        obs_pos = 0
-        if self.position > 0:
-            obs_pos = 1
-        elif self.position < 0:
-            obs_pos = -1
-        if act == 1:
-            obs_pos = -1
-        elif act == 2:
-            obs_pos = 1
-        """
+        self.position_value = 0
 
         return [self.position_value] + self.history, reward, self.done # obs, reward, done
 
@@ -216,14 +162,14 @@ def train_ddqn(env):
     optimizer = chainer.optimizers.Adam()
     optimizer.setup(Q)
 
-    epoch_num = 60
+    epoch_num = 500
     step_max = len(env.data)-1
     memory_size = 200
     batch_size = 50
     epsilon = 1.0
     epsilon_decrease = 1e-3
     epsilon_min = 0.1
-    start_reduce_epsilon = 5 #200
+    start_reduce_epsilon = 200
     train_freq = 10
     update_q_freq = 20
     gamma = 0.97
@@ -253,7 +199,6 @@ def train_ddqn(env):
 
             # act
             obs, reward, done = env.step(pact)
-            pact = env.pre_act
 
             # add memory
             memory.append((pobs, pact, reward, obs, done))
@@ -332,10 +277,9 @@ def plot_train_test_by_q(train_env, test_env, date_split, Q, algorithm_name):
         pact = Q(np.array(pobs, dtype=np.float32).reshape(1, -1))
         print(pact.data)
         pact = np.argmax(pact.data)
+        train_acts.append(pact)
             
         obs, reward, done = train_env.step(pact)
-        pact = train_env.pre_act
-        train_acts.append(pact)
         train_rewards.append(reward)
 
         pobs = obs
@@ -351,10 +295,9 @@ def plot_train_test_by_q(train_env, test_env, date_split, Q, algorithm_name):
     
         pact = Q(np.array(pobs, dtype=np.float32).reshape(1, -1))
         pact = np.argmax(pact.data)
+        test_acts.append(pact)
             
         obs, reward, done = test_env.step(pact)
-        pact = test_env.pre_act
-        test_acts.append(pact)
         test_rewards.append(reward)
 
         pobs = obs
