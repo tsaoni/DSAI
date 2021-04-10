@@ -13,7 +13,7 @@
 ### 程式執行
 
 ```
-python trader.py --training "Training Data" -- testing "Testing Data" --output output.csv
+python trader.py --training training.csv --testing testing.csv --output output.csv
 ```
 ###### 執行時間約為309.2245971789962 sec
 
