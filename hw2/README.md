@@ -42,6 +42,7 @@ In DDQN.py...
 #### plotting function
 
 * plot_train_test_by_q (印出模型在股票曲線圖所會採取的action)
+#### 其中，灰色為持有，藍色為買入，紅色為賣出
 ![](https://i.imgur.com/qU02Qr8.png)
 ###### 很勤勞但是獲利極低
 ![](https://i.imgur.com/nJnrOYV.png)
